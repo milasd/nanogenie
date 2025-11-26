@@ -11,9 +11,16 @@ I intend to reproduce the training process (in a "nano-scale"). For that purpose
 
 ### Training
 
-I would conceptually summarise the above in 2 "bigger blocks":
+I would conceptually summarise the above in 2 "bigger blocks" for personal understanding on how to map my development process:
   1. Input feature "generation": From a set of frames, obtain frame features z_t-1 (with video tokenizer, II) and action a (with latent action inference, I).
   2. The world model (Dynamics model, III): from input features z_t-1 and a, outputs z_t.
+
++------------------+     +-------------+
+| Input features   | --> | World model |
+| "generation"     |     |    (III)    |
+|   (I, II)        |     |             |
++------------------+     +-------------+
+
 
 After this step, I'll look into potential datasets of choice for the training process, which should be open-sourced. The to-be trained model for this study should have some million parameters, for a first experiment. 
 
