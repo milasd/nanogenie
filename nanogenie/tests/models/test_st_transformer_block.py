@@ -120,3 +120,13 @@ def test_single_spatial_location(st_block_config, causal_mask):
     output = st_transf(x, causal_mask)
 
     assert output.shape == (B, T, 1, 1, d_model)
+
+
+def test_deterministic_output(st_block, causal_mask, test_input):
+    """Test if same input will produce same output"""
+    torch.manual_seed(22)
+    out1 = st_block(test_input, causal_mask)
+    torch.manual_seed(22)
+    out2 = st_block(test_input, causal_mask)
+
+    assert torch.allclose(out1, out2)
