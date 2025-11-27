@@ -13,6 +13,14 @@ class STTransformerBlock(nn.Module):
     """
 
     def __init__(self, d_model: int, num_heads: int, ffn_dim: int):
+        """
+        Initialize ST-Transformer block.
+
+        Args:
+            d_model: Embedding dimension
+            num_heads: Number of attention heads
+            ffn_dim: Hidden dimension of feed-forward network
+        """
         super().__init__()
         # Spatial attention
         # [B, T, H, W, d_model] -> [B*T, H*W, d_model]
@@ -38,8 +46,14 @@ class STTransformerBlock(nn.Module):
         self, x: torch.Tensor, causal_mask: torch.Tensor | None
     ) -> torch.Tensor:
         """
-        x: [B, T, H, W, d_model]
+        Forward pass through ST-Transformer block.
 
+        Args:
+            x: Input tensor of shape [B, T, H, W, D]
+            causal_mask: Optional causal mask for temporal attention of shape [T, T]
+
+        Returns:
+            Output tensor of shape [B, T, H, W, D]
         """
         ### 1. Spatial Attention ##
         x_spatial = self.spatial_attention(x)  # [B, T, H, W, D]
@@ -53,6 +67,15 @@ class STTransformerBlock(nn.Module):
         return ffn_out
 
     def spatial_attention(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply spatial self-attention across spatial dimensions (H, W) for each frame.
+
+        Args:
+            x: Input tensor of shape [B, T, H, W, D]
+
+        Returns:
+            Output tensor of shape [B, T, H, W, D]
+        """
         # Get input dimensions
         B, T, H, W, D = x.shape
 
@@ -77,6 +100,16 @@ class STTransformerBlock(nn.Module):
     def temporal_attention(
         self, x: torch.Tensor, causal_mask: torch.Tensor
     ) -> torch.Tensor:
+        """
+        Apply causal temporal self-attention across time dimension (T) for each spatial location.
+
+        Args:
+            x: Input tensor of shape [B, T, H, W, D]
+            causal_mask: Causal mask of shape [T, T] to prevent attending to future frames
+
+        Returns:
+            Output tensor of shape [B, T, H, W, D]
+        """
         B, T, H, W, D = x.shape
         # Flatten for multi-head attention
         x_temporal = rearrange(
@@ -99,6 +132,15 @@ class STTransformerBlock(nn.Module):
         return x_temporal
 
     def feed_forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply feed-forward network with residual connection and layer normalization.
+
+        Args:
+            x: Input tensor of shape [B, T, H, W, D]
+
+        Returns:
+            Output tensor of shape [B, T, H, W, D]
+        """
         ffn_out = self.ffn(x)
         ffn_out = self.ffn_norm(x + ffn_out)  # [B, T, H, W, D]
         return ffn_out
