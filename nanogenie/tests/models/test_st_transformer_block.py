@@ -67,11 +67,13 @@ def test_forward_shape(st_block, causal_mask, test_input):
 
 
 def test_spatial_attention_intermediate_reshape(st_block, test_input):
-    """Test if spatial attention correctly reshapes input to [B*T, H*W, D]"""
+    """Test if spatial attention correctly reshapes input to [B*T, H*W, D] 
+    and if attn. result not all-zero"""
     captured = {}
 
     def hook(module, input, output):
         captured["spatial_attn_reshape"] = input[0].shape
+        captured["attn_output"] = output[0]
 
     # Register hook on the spatial attention layer
     handle = st_block.spatial_attn.register_forward_hook(hook)
@@ -79,20 +81,24 @@ def test_spatial_attention_intermediate_reshape(st_block, test_input):
     handle.remove()
 
     assert captured["spatial_attn_reshape"] == (B * T, H * W, d_model)
+    assert not torch.allclose(captured["attn_output"], torch.zeros_like(captured["attn_output"]))
 
 
 def test_temporal_attention_intermediate_reshape(st_block, causal_mask, test_input):
-    """Test if temporal attention correctly reshapes input to [B*H*W, T, D]"""
+    """Test if temporal attention correctly reshapes input to [B*H*W, T, D]
+    and if attn. result not all-zero"""
     captured = {}
 
     def hook(module, input, output):
         captured["temporal_attn_reshape"] = input[0].shape
+        captured["attn_output"] = output[0]
 
     handle = st_block.temporal_attn.register_forward_hook(hook)
     st_block.temporal_attention(x=test_input, causal_mask=causal_mask)
     handle.remove()
 
     assert captured["temporal_attn_reshape"] == (B * H * W, T, d_model)
+    assert not torch.allclose(captured["attn_output"], torch.zeros_like(captured["attn_output"]))
 
 
 def test_causal_mask_prevents_future_attention(st_block, test_input, causal_mask):
