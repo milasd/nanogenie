@@ -57,7 +57,7 @@ def test_temporal_attention_shape(st_block, causal_mask, test_input):
 
 
 def test_ffn_output_shape(st_block, test_input):
-    x_ffn = st_block.ffn_residual(test_input)
+    x_ffn = st_block.feed_forward(test_input)
     assert x_ffn.shape == (B, T, H, W, d_model)
 
 

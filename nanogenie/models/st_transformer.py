@@ -48,7 +48,7 @@ class STTransformerBlock(nn.Module):
         x_temporal = self.temporal_attention(x_spatial, causal_mask)  # [B, T, H, W, D]
 
         ### 3. Feed-forward network ###
-        ffn_out = self.ffn_residual(x_temporal)
+        ffn_out = self.feed_forward(x_temporal)
 
         return ffn_out
 
@@ -98,7 +98,7 @@ class STTransformerBlock(nn.Module):
 
         return x_temporal
 
-    def ffn_residual(self, x: torch.Tensor) -> torch.Tensor:
+    def feed_forward(self, x: torch.Tensor) -> torch.Tensor:
         ffn_out = self.ffn(x)
         ffn_out = self.ffn_norm(x + ffn_out)  # [B, T, H, W, D]
         return ffn_out
