@@ -4,6 +4,38 @@ from einops import rearrange
 from torch import nn
 
 
+class STTransformer(nn.Module):
+    """
+    ST-Transformer architecture.
+    Consists on stacking num_blocks blocks of STTransformerBlock.
+    """
+
+    def __init__(
+        self,
+        num_layers: int = 12,
+        d_model: int = 512,
+        num_heads: int = 8,
+        ffn_dim: int = 2048,
+    ):
+        super().__init__()
+
+        self.blocks = nn.ModuleList(
+            [
+                STTransformerBlock(
+                    d_model=d_model, num_heads=num_heads, ffn_dim=ffn_dim
+                )
+                for _ in range(num_layers)
+            ]
+        )
+
+    def forward(self, x: torch.Tensor, causal_mask: torch.Tensor) -> torch.Tensor:
+        x_out = x
+        for block in self.blocks:
+            x_out = block(x=x_out, causal_mask=causal_mask)
+
+        return x_out
+
+
 class STTransformerBlock(nn.Module):
     """
     Each ST-Transformer block has:
