@@ -50,3 +50,5 @@ uv.lock
 
 # Logs
 *.log
+
+.*_cache

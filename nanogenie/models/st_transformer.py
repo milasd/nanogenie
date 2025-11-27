@@ -42,7 +42,17 @@ class STTransformerBlock(nn.Module):
 
         """
         ### 1. Spatial Attention ##
+        x_spatial = self.spatial_attention(x)  # [B, T, H, W, D]
 
+        ### 2. Temporal attention ###
+        x_temporal = self.temporal_attention(x_spatial, causal_mask)  # [B, T, H, W, D]
+
+        ### 3. Feed-forward network ###
+        ffn_out = self.ffn_residual(x_temporal)
+
+        return ffn_out
+
+    def spatial_attention(self, x: torch.Tensor) -> torch.Tensor:
         # Get input dimensions
         B, T, H, W, D = x.shape
 
@@ -62,11 +72,15 @@ class STTransformerBlock(nn.Module):
             x_spatial, "(b t) (h w) d -> b t h w d", b=B, t=T, h=H, w=W
         )  # [B*T, H*W, D] -> [B, T, H, W, D]
 
-        ### 2. Temporal attention ###
+        return x_spatial
 
+    def temporal_attention(
+        self, x: torch.Tensor, causal_mask: torch.Tensor
+    ) -> torch.Tensor:
+        B, T, H, W, D = x.shape
         # Flatten for multi-head attention
         x_temporal = rearrange(
-            x_spatial, "b t h w d -> (b h w) t d"
+            x, "b t h w d -> (b h w) t d"
         )  # [B, T, H, W, D] -> [B*H*W, T, D]
 
         # Pass causal mask to temporal attention
@@ -82,9 +96,9 @@ class STTransformerBlock(nn.Module):
             x_temporal, "(b h w) t d -> b t h w d", b=B, h=H, w=W
         )  # [B*H*W, T, D] -> [B, T, H, W, D]
 
-        ### 3. Feed-forward network ###
+        return x_temporal
 
-        ffn_out = self.ffn(x_temporal)
-        ffn_out = self.ffn_norm(x_temporal + ffn_out)  # [B, T, H, W, D]
-
+    def ffn_residual(self, x: torch.Tensor) -> torch.Tensor:
+        ffn_out = self.ffn(x)
+        ffn_out = self.ffn_norm(x + ffn_out)  # [B, T, H, W, D]
         return ffn_out
