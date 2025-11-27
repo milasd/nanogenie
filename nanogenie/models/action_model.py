@@ -1,4 +1,5 @@
 """Action model params"""
+
 NUM_LAYERS = 8
 D_MODEL = 512
 NUM_HEADS = 8
