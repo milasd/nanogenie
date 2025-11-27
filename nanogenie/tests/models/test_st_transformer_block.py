@@ -3,7 +3,7 @@ import torch
 
 from nanogenie.models import STTransformerBlock
 
-
+# Smaller dimensions for test
 B, T, H, W, d_model = 1, 2, 2, 2, 8
 
 
@@ -130,3 +130,13 @@ def test_deterministic_output(st_block, causal_mask, test_input):
     out2 = st_block(test_input, causal_mask)
 
     assert torch.allclose(out1, out2)
+
+
+def test_different_batch_sizes(st_block_config, causal_mask):
+    """Test block works with different batch sizes"""
+    block = STTransformerBlock(**st_block_config)
+
+    for batch_size in [1, 2, 4]:
+        x = torch.randn(batch_size, T, H, W, d_model)
+        output = block(x, causal_mask)
+        assert output.shape == (batch_size, T, H, W, d_model)
