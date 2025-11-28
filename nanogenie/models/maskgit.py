@@ -1,6 +1,5 @@
 import torch
 
-VOCAB_SIZE = 
 class MaskGIT:
     @staticmethod
     def apply_masking(z: torch.Tensor, mask_ratio: float, mask_token_id: int = VOCAB_SIZE) -> tuple[torch.Tensor, torch.Tensor]:
@@ -17,5 +16,5 @@ class MaskGIT:
             mask: Mask w/ booleans showing which were masked.
         """
         # Keep frame 1 unmasked; mask 2 to T-1 randomly.
-
+        pass
 
