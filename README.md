@@ -36,7 +36,20 @@ I would conceptually summarise the above in 2 "bigger blocks" for personal under
 +------------------+     +-------------+
 ```
 
+```
+Input frames →  Video Tokenizer  →  Tokens
+(B,T,H,W,C)     (B,T,H,W,C)         (B,T,D_t) or (B, T, H_t, W_t)
+
+Input frames →  LAM              →  Actions
+(B,T,H,W,C)     (B,T,H,W,C)         (B,T-1)
+
+Tokens + Actions → Dynamics Model →  Next Tokens
+(B,T-1,D_t)        (B,T-1,D_t)       (B,T-1,D_t)
+(B,T-1)            (B,T-1)
+```
+
 After this step, I'll look into potential datasets of choice for the training process, which should be open-sourced. The to-be trained model for this study should have some million parameters, for a first experiment. 
+
 
 ## Inference
 
