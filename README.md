@@ -12,7 +12,7 @@ I intend to reproduce the training process (in a "nano-scale") as suggested in t
 
 - [x] Implement ST-Transformer
 - [x] Implement Dynamics Model w/ forward(..)
-- [ ] Implement MaskGIT masking
+- [x] Implement MaskGIT masking
 - [ ] Training Loop (Dynamics Model)
   - [ ] Data loading
   - [ ] Forward pass (w/ masking)
