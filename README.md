@@ -1,8 +1,8 @@
 # nanogenie
 
-A reproduction of the world model Genie 1 architecture, as reported in the paper (Genie: Generative Interactive Environments)[https://arxiv.org/pdf/2402.15391], but in a much smaller scale.
+A reproduction of the world model Genie 1 architecture, as reported in the paper [Genie: Generative Interactive Environments](https://arxiv.org/pdf/2402.15391), in a smaller scale.
 
-I intend to reproduce the training process (in a "nano-scale"). For that purpose, I'm first building the following model components w/ PyTorch and uv (for dependency management):
+I intend to reproduce the training process (in a "nano-scale") as suggested in the paper appendix. For that purpose, I'm first building the following model components w/ PyTorch and uv (for dependency management):
 
   - I) Latent action model (infers the latent action 𝒂 between each pair of frames)
   - II) Video tokenizer (converts raw video frames into discrete tokens 𝒛)
