@@ -18,8 +18,8 @@ C = 3  # Color channels
 # Video tokenizer (z)
 
 P_z = 4  # Patch size for tokenizer
-H_z = H // P_z  # = 22 (height in tokens)
-W_z = W // P_z  # = 40 (width in tokens)
+H_z = H // P_z  # = 16 (height in tokens)
+W_z = W // P_z  # = 16 (width in tokens)
 D_z = H_z * W_z  # = 256 (spatial tokens per frame, called D in paper)
 V_z = 1024  # Codebook size (number of unique codes)
 E_z = 32  # Embedding/latent dimension for codebook
@@ -29,10 +29,10 @@ E_z = 32  # Embedding/latent dimension for codebook
 # Latent action model (a)
 
 P_a = 16  # Patch size for LAM
-H_a = H // P_a  # ≈ 5 (height in tokens)
-W_a = W // P_a  # = 10 (width in tokens)
-D_a = H_a * W_a  # ≈ 50 (spatial tokens per frame for LAM)
-V_a = 8  # Number of latent actions (codebook size, |A| in paper)
+H_a = H // P_a  # ≈ 4 (height in tokens)
+W_a = W // P_a  # = 4 (width in tokens)
+D_a = H_a * W_a  # ≈ 16 (spatial tokens per frame for LAM)
+V_a = 6  # Number of latent actions (codebook size, |A| in paper, 8 for main exp. but 6 for reduced)
 E_a = 32  # Action embedding dimension
 
 # Architecture
