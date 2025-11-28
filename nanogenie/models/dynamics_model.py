@@ -8,14 +8,12 @@ from torch import nn
 class DynamicsModel(nn.Module):
     """
     Implement the Dynamics Model described in Genie 1.
-    It is a decoder-only MaskGIT.
 
     Input:
     z_(t-1): Tokenized video representation. Shape [T-1, H', W'] || [B, T-1, H', W'];
                                                 T: n. of frames,
-                                                H': height / s,
-                                                W': width / s;
-                                                s is the downscaling factor for VQ-VAE.
+                                                H': frame height // patch size,
+                                                W': frame width // patch size;
 
     a: Latent action. Shape [T-1, d_a], || [B, T-1, d_a];
                              T-1: n. of actions in all frames T,
@@ -24,12 +22,11 @@ class DynamicsModel(nn.Module):
 
     def __init__(
         self,
-        vocab_size: int = 8,
+        vocab_z: int = 1024,
+        vocab_a: int = 6,
         d_model: int = 512,
-        d_embedding: int = 512,
         num_layers: int = 12,
         num_heads: int = 8,
-        d_action: int = 16,
         ffn_dim: int = 2048,
     ):
         """
@@ -39,21 +36,21 @@ class DynamicsModel(nn.Module):
         super().__init__()
 
         # Token embeddings
-        self.z_embedding = nn.Embedding(vocab_size, d_model)
+        self.z_embedding = nn.Embedding(vocab_z, d_model)
 
         # Latent action embeddings
-        self.a_embedding = nn.Linear(d_action, d_model)
+        self.a_embedding = nn.Embedding(vocab_a, d_model)
 
         # Add ST-Transformer blocks
         self.st_transformer = STTransformer(
             num_heads=num_heads,
             num_layers=num_layers,
             d_model=d_model,
-            ffn_dim=d_model * 4,
+            ffn_dim=ffn_dim,
         )
 
-        # Output projection, d_model -> vocab_size
-        self.output_head = nn.Linear(d_model, vocab_size)
+        # Output projection, d_model -> vocab_z
+        self.output_head = nn.Linear(d_model, vocab_z)
 
     def forward(
         self, z: torch.Tensor, a: torch.Tensor, causal_mask: torch.Tensor
@@ -66,7 +63,7 @@ class DynamicsModel(nn.Module):
         # [B, T-1, dim_model] -> [B, T-1, 1, 1, dim_model]
         a_emb = rearrange(a_emb, "b t d -> b t 1 1 d")
 
-        # 3. Combine token and action embeddings (additive)
+        # 3. Additive embedding
         x = z_emb + a_emb  # [B, T-1, H', W', dim_model]
 
         # 4. ST-Transformer with causal mask
@@ -75,6 +72,6 @@ class DynamicsModel(nn.Module):
         )  # [B, T-1, H', W', dim_model]
 
         # 5. Output Head
-        logits = self.output_head(x_transf)  # [B, T-1, H', W', vocab_size]
+        logits = self.output_head(x_transf)  # [B, T-1, H', W', vocab_z]
 
         return logits
