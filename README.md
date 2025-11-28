@@ -4,10 +4,23 @@ A reproduction of the world model Genie 1 architecture, as reported in the paper
 
 I intend to reproduce the training process (in a "nano-scale"). For that purpose, I'm first building the following model components w/ PyTorch:
 
-  - I) Latent action model (infers the latent action 𝒂 between each pair of frames) 
+  - I) Latent action model (infers the latent action 𝒂 between each pair of frames)
   - II) Video tokenizer (converts raw video frames into discrete tokens 𝒛)
   - III) Dynamics model (given a latent action and past frame tokens, predicts the next frame of the video).
 
+#### To do - steps
+
+- [x] Implement ST-Transformer
+- [x] Implement Dynamics Model w/ forward(..)
+- [ ] Implement MaskGIT masking
+- [ ] Training Loop (Dynamics Model)
+  - [ ] Data loading
+  - [ ] Forward pass (w/ masking)
+  - [ ] Computing loss
+  - [ ] Backward pass
+  - [ ] etc..
+- [ ] Implement Video Tokenizer
+- [ ] Implement Latent action model
 
 ## Training
 
