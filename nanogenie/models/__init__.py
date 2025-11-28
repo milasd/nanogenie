@@ -1,3 +1,3 @@
 from .st_transformer import STTransformerBlock
 
-__all__ = ["STTransformerBlock"]
+__all__ = ["STTransformerBlock", "STTransformer"]
