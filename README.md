@@ -8,12 +8,12 @@ I intend to reproduce the training process (in a "nano-scale"). For that purpose
   - II) Video tokenizer (converts raw video frames into discrete tokens 𝒛)
   - III) Dynamics model (given a latent action and past frame tokens, predicts the next frame of the video).
 
-#### To do (at the moment)
+#### To do - steps
 
 - [x] Implement ST-Transformer
 - [x] Implement Dynamics Model w/ forward(..)
 - [ ] Implement MaskGIT masking
-- [ ] Training Loop
+- [ ] Training Loop (Dynamics Model)
   - [ ] Data loading
   - [ ] Forward pass (w/ masking)
   - [ ] Computing loss
