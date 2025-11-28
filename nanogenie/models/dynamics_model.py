@@ -1,8 +1,8 @@
 import torch
-from torch import nn
 
 from einops import rearrange
 from nanogenie.models import STTransformer
+from torch import nn
 
 
 class DynamicsModel(nn.Module):
@@ -11,13 +11,13 @@ class DynamicsModel(nn.Module):
     It is a decoder-only MaskGIT.
 
     Input:
-    z_(t-1): Tokenized video representation. Shape [T-1, H', W'];
+    z_(t-1): Tokenized video representation. Shape [T-1, H', W'] || [B, T-1, H', W'];
                                                 T: n. of frames,
                                                 H': height / s,
                                                 W': width / s;
                                                 s is the downscaling factor for VQ-VAE.
 
-    a: Latent action. Shape [T-1, d_a];
+    a: Latent action. Shape [T-1, d_a], || [B, T-1, d_a];
                              T-1: n. of actions in all frames T,
                              d_a: dimension of latent embedding (default 32)
     """
@@ -44,8 +44,6 @@ class DynamicsModel(nn.Module):
         # Latent action embeddings
         self.a_embedding = nn.Linear(d_action, d_model)
 
-        # Positional embeddings?
-
         # Add ST-Transformer blocks
         self.st_transformer = STTransformer(
             num_heads=num_heads,
@@ -64,8 +62,7 @@ class DynamicsModel(nn.Module):
         z_emb = self.z_embedding(z)  # [B, T-1, H', W', dim_model]
         a_emb = self.a_embedding(a)  # [B, T-1, dim_model]
 
-        # 2. "Expand" a to cover all frame.
-        # As the original action tensor is 1 action per frame only
+        # 2. "Expand" a as the original action tensor is 1 action per frame only
         # [B, T-1, dim_model] -> [B, T-1, 1, 1, dim_model]
         a_emb = rearrange(a_emb, "b t d -> b t 1 1 d")
 
