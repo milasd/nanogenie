@@ -8,19 +8,7 @@ I intend to reproduce the training process (in a "nano-scale") as suggested in t
   - II) Video tokenizer (converts raw video frames into discrete tokens 𝒛)
   - III) Dynamics model (given a latent action and past frame tokens, predicts the next frame of the video).
 
-#### To do - steps
 
-- [x] Implement ST-Transformer
-- [x] Implement Dynamics Model w/ forward(..)
-- [x] Implement MaskGIT masking
-- [ ] Training Loop (Dynamics Model)
-  - [ ] Data loading
-  - [ ] Forward pass (w/ masking)
-  - [ ] Computing loss
-  - [ ] Backward pass
-  - [ ] etc..
-- [ ] Implement Video Tokenizer
-- [ ] Implement Latent action model
 
 ## Training
 
@@ -48,8 +36,22 @@ Tokens + Actions → Dynamics Model →  Next Tokens
 (B,T-1)            (B,T-1)
 ```
 
-After this step, I'll look into potential datasets of choice for the training process, which should be open-sourced. The to-be trained model for this study should have some million parameters, for a first experiment. 
+#### To do: steps
 
+- [x] Implement ST-Transformer
+- [x] Implement Dynamics Model w/ forward(..)
+- [x] Implement MaskGIT masking
+- [ ] Training Loop (Dynamics Model)
+  - [ ] Data loading
+  - [ ] Forward pass (w/ masking)
+  - [ ] Computing loss
+  - [ ] Backward pass
+  - [ ] etc..
+- [ ] Implement Video Tokenizer
+- [ ] Implement Latent action model
+
+
+Afterwards, I'll look into the suggested dataset for the small scale experiment and try running the training experiment. If training appears to be properly written, I'll implement the inference.
 
 ## Inference
 
