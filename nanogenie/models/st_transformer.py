@@ -28,7 +28,26 @@ class STTransformer(nn.Module):
             ]
         )
 
-    def forward(self, x: torch.Tensor, causal_mask: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, causal_mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
+        """
+        Forward pass through ST-Transformer.
+
+        Args:
+            x: Input tensor of shape [B, T, H, W, D]
+            causal_mask: Optional causal mask. If None, creates one automatically.
+
+        Returns:
+            Output tensor of shape [B, T, H, W, D]
+        """
+        # Create causal mask if not provided
+        if causal_mask is None:
+            T = x.shape[1]
+            causal_mask = torch.triu(
+                torch.ones(T, T, device=x.device), diagonal=1
+            ).bool()
+
         x_out = x
         for block in self.blocks:
             x_out = block(x=x_out, causal_mask=causal_mask)
