@@ -28,12 +28,12 @@ class MaskGIT:
         probs = mask_ratio.expand(B, T_minus_1 - 1, H, W)
 
         # Create boolean mask for frames 2 to T-1 (Bernoulli sampling).
-        frames_to_mask = torch.bernoulli(probs).bool()  # [B, T-2, H, W]
+        frames_masking = torch.bernoulli(probs).bool()  # [B, T-2, H, W]
 
         # Create final mask (first element never masked) to match shape of z
         # Define False for first frame (won't mask)
         mask = torch.zeros((B, T_minus_1, H, W), dtype=torch.bool, device=z.device)
-        mask[:, 1:, :, :] = frames_to_mask
+        mask[:, 1:, :, :] = frames_masking
 
         # Apply masking
         z_masked = z.clone()

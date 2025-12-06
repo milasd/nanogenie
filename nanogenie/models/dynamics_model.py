@@ -9,15 +9,19 @@ class DynamicsModel(nn.Module):
     """
     Implement the Dynamics Model described in Genie 1.
 
-    Input:
-    z_(t-1): Tokenized video representation. Shape [T-1, H', W'] || [B, T-1, H', W'];
-                                                T: n. of frames,
-                                                H': frame height // patch size,
-                                                W': frame width // patch size;
+    Attributes:
+        z_embedding (nn.Embedding): Embedding for discrete video tokens. [B, T-1, H', W', d_model]
+        a_embedding (nn.Embedding): Embedding for the latent actions.   [B, T-1, H', W', d_model]
+        st_transformer (STTransformer): The backbone processing spatial and temporal dependencies.
+        output_head (nn.Linear): Projects the transformer output back to the token vocabulary.
 
-    a: Latent action. Shape [T-1, d_a], || [B, T-1, d_a];
-                             T-1: n. of actions in all frames T,
-                             d_a: dimension of latent embedding (default 32)
+    Args:
+        vocab_z (int): Size of the video tokenizer codebook (default: 1024).
+        vocab_a (int): Number of discrete latent actions (default: 6 for CoinRun, 8 for Platformers).
+        d_model (int): Hidden dimension of the transformer (default: 512).
+        num_layers (int): Number of ST-Transformer blocks (default: 12).
+        num_heads (int): Number of attention heads (default: 8).
+        ffn_dim (int): Dimension of the feed-forward network (default: 2048).
     """
 
     def __init__(
@@ -29,10 +33,6 @@ class DynamicsModel(nn.Module):
         num_heads: int = 8,
         ffn_dim: int = 2048,
     ):
-        """
-        z_in: [B, T-1, H', W']      for frames 1..T-1
-        a: [B, T-1, d_a]            for actions 2..T-1
-        """
         super().__init__()
 
         # Token embeddings
@@ -56,20 +56,20 @@ class DynamicsModel(nn.Module):
         self, z: torch.Tensor, a: torch.Tensor, causal_mask: torch.Tensor
     ) -> torch.Tensor:
         # 1. Embeddings
-        z_emb = self.z_embedding(z)  # [B, T-1, H', W', dim_model]
-        a_emb = self.a_embedding(a)  # [B, T-1, dim_model]
+        z_emb = self.z_embedding(z)  # [B, T-1, H', W', d_model]
+        a_emb = self.a_embedding(a)  # [B, T-1, d_model]
 
         # 2. "Expand" a as the original action tensor is 1 action per frame only
-        # [B, T-1, dim_model] -> [B, T-1, 1, 1, dim_model]
+        # [B, T-1, dim_model] -> [B, T-1, 1, 1, d_model]
         a_emb = rearrange(a_emb, "b t d -> b t 1 1 d")
 
         # 3. Additive embedding
-        x = z_emb + a_emb  # [B, T-1, H', W', dim_model]
+        x = z_emb + a_emb  # [B, T-1, H', W', d_model]
 
         # 4. ST-Transformer with causal mask
         x_transf = self.st_transformer(
             x=x, causal_mask=causal_mask
-        )  # [B, T-1, H', W', dim_model]
+        )  # [B, T-1, H', W', d_model]
 
         # 5. Output Head
         logits = self.output_head(x_transf)  # [B, T-1, H', W', vocab_z]
